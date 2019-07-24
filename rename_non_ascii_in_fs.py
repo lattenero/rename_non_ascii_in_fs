@@ -41,6 +41,7 @@ def ascii_name(path,filename,filter={}):
       new_name = new_name.replace('%','')
       new_name = new_name.replace('~','-')
       new_name = new_name.replace('+','_')
+      new_name = new_name.replace('\'','')
       new_name = new_name.replace('*','')
       new_name = new_name.replace('>','')
       new_name = new_name.replace('<','')

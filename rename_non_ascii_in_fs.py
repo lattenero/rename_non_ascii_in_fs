@@ -39,6 +39,7 @@ def ascii_name(path,filename,filter={}):
       new_name = new_name.replace('=','')
 
       new_name = new_name.replace('%','')
+      new_name = new_name.replace('+','_')
       new_name = new_name.replace('*','')
       new_name = new_name.replace('>','')
       new_name = new_name.replace('<','')
@@ -49,10 +50,10 @@ def ascii_name(path,filename,filter={}):
       new_name = new_name.replace(')','')
 
     new_name = re.sub(r'[^\x00-\x7F]+', '_', new_name)
-    new_name = re.sub('^[\ ]+', '_', new_name)
-    new_name = re.sub('__+', '_', new_name)
-    new_name = re.sub(r' +', ' ', new_name)
-    new_name = re.sub('\.\.', '.', new_name)
+    new_name = re.sub('^ +', '_', new_name)
+    new_name = re.sub(' +', '_', new_name)
+    new_name = re.sub('_+', '_', new_name)
+    new_name = re.sub('\.+', '.', new_name)
 
     return new_name
 
@@ -67,30 +68,40 @@ def check_path(path=None, action=None, filter={}):
            path = path + "/"
 
    for filename in os.listdir(path):
-      new_name = ascii_name(path, filename, filter)
-      if not new_name == filename:
-          while os.path.exists(path + new_name):
-              new_name = "_" + new_name
+       if os.path.isfile(path + filename):
+           new_name = ascii_name(path, filename, filter)
+           if not new_name == filename:
+               while os.path.exists(path + new_name):
+                   new_name = "_" + new_name
 
-          if action == "rename":
-              print("Rename: %s%s => %s%s" % (path, filename, path, new_name))
- #            os.rename(path + filename, path + new_name)
-              sub_dir = path + new_name
-          elif action == "test":
-              print("Test: %s%s => %s%s" % (path, filename, path, new_name))
-              sub_dir = path + filename
+               if action == "rename":
+                   print("Rename file: %s%s => %s%s" % (path, filename, path, new_name))
+                   os.rename(path + filename, path + new_name)
+               elif action == "test":
+                   print("Test file: %s%s => %s%s" % (path, filename, path, new_name))
+               elif action == "list":
+                   print("Found file: %s%s" % (path, filename))
 
-          elif action == "list":
-              print("Found: %s%s" % (path, filename))
-              sub_dir = path + filename
+   for filename in os.listdir(path):
+      if os.path.isdir(path + filename):
+          new_name = ascii_name(path, filename, filter)
 
-          if os.path.isdir(path + filename):
-             check_path(sub_dir, action, filter)
+          if not new_name == filename:
+              while os.path.exists(path + new_name):
+                  new_name = "_" + new_name
 
-          if os.path.isdir(path + new_name):
-             check_path(sub_dir, action, filter)
-
-
+              if action == "rename":
+                 print("Rename Dir: %s%s => %s%s" % (path, filename, path, new_name))
+                 os.rename(path + filename, path + new_name)
+                 check_path(path + new_name, action, filter)
+              elif action == "test":
+                 print("Test Dir: %s%s => %s%s" % (path, filename, path, new_name))
+                 check_path(path + filename, action, filter)
+              elif action == "list":
+                 print("Found Dir: %s%s" % (path, filename))
+                 check_path(path + filename, action, filter)
+          else:
+              check_path(path + filename, action, filter)
 def main(argv):
    path = ''
    filter={}

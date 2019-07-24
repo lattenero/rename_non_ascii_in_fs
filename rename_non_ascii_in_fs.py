@@ -7,11 +7,10 @@ import sys, getopt
 import os
 import re
 
-init_path="/home/raoul/tmp"
 duplicates=[]
 
 def helper():
-    print('path_check.py -p <path> -a action=list|test|rename -f special')
+    print('rename_non_ascii_in_fs.py -p <path> -a action=list|test|rename -f special')
     sys.exit()
 
 def is_ascii(s):
@@ -50,10 +49,10 @@ def ascii_name(path,filename,filter={}):
       new_name = new_name.replace(')','')
 
     new_name = re.sub(r'[^\x00-\x7F]+', '_', new_name)
-    new_name = re.sub(r'^[\ ]+', '_', new_name)
-    new_name = re.sub(r'__+', '_', new_name)
-    new_name = re.sub(r'\ +', '\ ', new_name)
-    new_name = re.sub(r'\.\.', '\.', new_name)
+    new_name = re.sub('^[\ ]+', '_', new_name)
+    new_name = re.sub('__+', '_', new_name)
+    new_name = re.sub(r' +', ' ', new_name)
+    new_name = re.sub('\.\.', '.', new_name)
 
     return new_name
 
